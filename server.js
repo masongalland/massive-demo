@@ -19,14 +19,28 @@ app.get('/', (req, res) => {
 
 app.get('/incidents', (req, res) => {
   const db = req.app.get('db');
+  const state = req.query.state;
 
-  db.getAllIncidents().then(incidents => {
-    res.send(incidents)
-  })
+  if(state) {
+    db.getIncidentsByState([state]).then(incidents => {
+      res.send(incidents)
+    })
+  }
+  else {
+    db.getAllIncidents().then(incidents => {
+      res.send(incidents)
+    })
+  }
 });
 
 app.post('/incidents', (req, res) => {
-  res.send({id: 123});
+  const db = req.app.get('db');
+  const incident = req.body;
+  
+  db.createIncident([incident.state, incident.causeId, incident.injuryId])
+  .then(results => {
+    res.send(results)
+  })
 });
 
 massive ('postgres://zkddtdawkhgcsp:e9e91625b4cf703e5d9c02f5b95fec1c02976f3fcb9f57343d6dd9b0a16efa04@ec2-50-19-95-47.compute-1.amazonaws.com:5432/db7p94efjckrqa?ssl=true')
